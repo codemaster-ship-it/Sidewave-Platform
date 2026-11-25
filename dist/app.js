@@ -1,7 +1,7 @@
 import { canPlay, collection, creditPacks, eligible, features, plans, tracks } from './content.js';
 
 const icons = {
-  logo: '<path d="M3 15c2.1 0 2.1-6 4.4-6 2.4 0 2.1 8 4.6 8s2.4-10 4.6-10c2 0 2.1 6 4.4 6"/>',
+  logo: '<path d="M22 18c0 2.2-1.8 4-4 4H6c-2.2 0-4-1.8-4-4V14c0-1.1.9-2 2-2h2c.6 0 1-.4 1-1V7c0-2.2 1.8-4 4-4s4 1.8 4 4v1c0 .6.4 1 1 1h8c2.2 0 4 1.8 4 4v4z"/><path d="M8 20v-6M11 20v-9M14 20v-4M17 20v-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
   home: '<path d="m3 10 9-7 9 7v10H3zm6 10v-7h6v7"/>',
   people: '<circle cx="9" cy="8" r="3"/><path d="M3 21v-2c0-3 2-5 5-5h2c3 0 5 2 5 5v2m2-16a3 3 0 0 1 0 6m1 3c2 0 3 2 3 5"/>',
   photo: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 17-6-6-8 9"/>',
@@ -35,7 +35,7 @@ const toast = document.querySelector('#toast');
 const price = cents => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(cents / 100);
 const dateLabel = input => new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(input));
 const clock = seconds => Math.floor(seconds / 60) + ':' + String(Math.floor(seconds % 60)).padStart(2, '0');
-const names = { home: 'Home', community: 'Commons', photos: 'Stillroom', music: 'Lowline', account: 'Settings', billing: 'Membership', member: 'Profile', search: 'Search' };
+const names = { home: 'Home', community: 'Stream', photos: 'Moments', music: 'Tracks', account: 'Settings', billing: 'Go Pro', member: 'Profile', search: 'Search' };
 const userRoute = username => 'member/' + esc(username);
 
 const state = { account: null, payments: false, connecting: true, failure: '', data: null, error: '', current: null, search: '', photoMode: 'all' };
@@ -93,23 +93,23 @@ function render() {
   const focusedAction = layout.contains(document.activeElement) && document.activeElement.dataset.action;
   const route = page();
   const pages = { home, community, photos, music, billing, account, member, search };
-  const body = state.connecting ? '<section class="panel"><p role="status">Connecting to Sidewave…</p></section>'
+  const body = state.connecting ? '<section class="panel"><p role="status">Connecting to tunecloud…</p></section>'
     : state.failure ? '<section class="panel"><h1>Connection unavailable</h1><p>' + esc(state.failure) + '</p>' + button('Retry', 'retry', 'primary') + '</section>'
-    : state.error ? '<section class="panel"><h1>' + (names[route] || 'Sidewave') + '</h1><p>' + esc(state.error) + '</p>' + button('Retry', 'refresh') + '</section>'
+    : state.error ? '<section class="panel"><h1>' + (names[route] || 'tunecloud') + '</h1><p>' + esc(state.error) + '</p>' + button('Retry', 'refresh') + '</section>'
     : Object.hasOwn(pages, route) ? pages[route]() : home();
   layout.innerHTML = `<div class="shell">
     <aside class="sidebar">
-      <a class="logo" href="#home"><span>${icon('logo')}</span>Sidewave</a>
+      <a class="logo" href="#home"><span>${icon('logo')}</span>tunecloud</a>
       <nav aria-label="Main navigation">
         ${nav('Home', 'home', 'home')}
         <div class="nav-label">Discover</div>
-        ${nav('Commons', 'community', 'people')}${nav('Stillroom', 'photos', 'photo')}${nav('Lowline', 'music', 'music')}
+        ${nav('Stream', 'community', 'people')}${nav('Moments', 'photos', 'photo')}${nav('Tracks', 'music', 'music')}
         <div class="nav-label">Account</div>
-        ${nav('Membership', 'billing', 'credit')}${nav('Settings', 'account', 'settings')}
+        ${nav('Go Pro', 'billing', 'credit')}${nav('Settings', 'account', 'settings')}
       </nav>
       <div class="sidebar-bottom">${state.account
         ? '<a href="#' + userRoute(state.account.username) + '" class="profile-link">' + avatar(state.account.name) + '<span><strong>' + esc(state.account.name) + '</strong><small>@' + esc(state.account.username) + '</small></span></a>'
-        : '<p>Join Sidewave to start posting, saving photos, and connecting with members.</p>' + button('Create account', 'signup', 'primary wide')}</div>
+        : '<p>Join tunecloud to start posting, saving photos, and connecting with members.</p>' + button('Create account', 'signup', 'primary wide')}</div>
     </aside>
     <div class="main-shell">
       <header class="topbar">
@@ -117,7 +117,7 @@ function render() {
         <form class="search-form" data-form="search">${icon('search')}<input type="search" name="query" aria-label="Search members by username" placeholder="Search members" value="${esc(state.search)}" required></form>
         <div class="top-actions">${state.account
           ? '<a class="profile-mini" href="#' + userRoute(state.account.username) + '" aria-label="My profile">' + avatar(state.account.name) + '</a>'
-          : button('Sign in', 'login', 'plain') + button('Join Sidewave', 'signup', 'primary compact')}</div>
+          : button('Log in', 'login', 'plain') + button('Join tunecloud', 'signup', 'primary compact')}</div>
       </header>
       <main id="content" tabindex="-1">${body}</main>
     </div></div>`;
@@ -126,10 +126,10 @@ function render() {
 
 function featured() {
   return `<section class="hero">
-    <div class="hero-copy"><span class="hero-label">${icon('wave')} Featured on Lowline</span>
+    <div class="hero-copy"><span class="hero-label">${icon('wave')} Featured on Tracks</span>
       <h1>Afterglow</h1>
       <p>Warm synths and a slow pulse from Circuit Atlas.</p>
-      <div class="actions">${button('Play track', 'play/afterglow', 'lime', 'play')}${link('Browse music', 'music', 'hero-link')}</div>
+      <div class="actions">${button('Play track', 'play/afterglow', 'lime', 'play')}${link('Browse tracks', 'music', 'hero-link')}</div>
     </div><span class="hero-album">AN OPEN WINDOW <span>·</span> CIRCUIT ATLAS</span>
   </section>`;
 }
@@ -142,22 +142,22 @@ function home() {
   return `<div class="dashboard">
     <div class="stack gap">
       ${featured()}
-      <section>${titleRow('From the community', link('Open Commons', 'community', 'text'))}
+      <section>${titleRow('From the stream', link('Open Stream', 'community', 'text'))}
         ${state.data?.feed?.items.length ? state.data.feed.items.slice(0, 2).map(post).join('') :
-          `<article class="panel empty"><div class="feature-icon lilac">${icon('people')}</div><div><h3>Start a conversation</h3><p>Share something with the Sidewave community.</p></div>${link('Open feed', 'community', 'secondary')}</article>`}
+          `<article class="panel empty"><div class="feature-icon lilac">${icon('people')}</div><div><h3>Start a conversation</h3><p>Share something with the tunecloud community.</p></div>${link('Open feed', 'community', 'secondary')}</article>`}
       </section>
-      <section>${titleRow('Field Notes', link('Open Stillroom', 'photos', 'text'))}<div class="photo-grid small-grid">${collection.map(photo => photoCard(photo, true)).join('')}</div></section>
+      <section>${titleRow('Moments', link('Open Moments', 'photos', 'text'))}<div class="photo-grid small-grid">${collection.map(photo => photoCard(photo, true)).join('')}</div></section>
     </div>
     <aside class="stack gap right-rail">
       <section class="panel tight">
-        ${titleRow('In rotation', link('All tracks', 'music', 'text'))}
+        ${titleRow('Now Playing', link('All tracks', 'music', 'text'))}
         ${tracks.map(track => trackRow(track, true)).join('')}
       </section>
       <section class="panel explorer">
-        <h2>Explore Sidewave</h2>
-        <a href="#community"><span class="feature-icon lilac">${icon('people')}</span><span><strong>Commons</strong><small>Posts and member profiles</small></span></a>
-        <a href="#photos"><span class="feature-icon sage">${icon('photo')}</span><span><strong>Stillroom</strong><small>Photos and collections</small></span></a>
-        <a href="#music"><span class="feature-icon peach">${icon('music')}</span><span><strong>Lowline</strong><small>Original tracks and previews</small></span></a>
+        <h2>Explore tunecloud</h2>
+        <a href="#community"><span class="feature-icon lilac">${icon('people')}</span><span><strong>Stream</strong><small>Posts and profiles</small></span></a>
+        <a href="#photos"><span class="feature-icon sage">${icon('photo')}</span><span><strong>Moments</strong><small>Moments and collections</small></span></a>
+        <a href="#music"><span class="feature-icon peach">${icon('music')}</span><span><strong>Tracks</strong><small>Tracks and previews</small></span></a>
       </section>
     </aside></div>`;
 }
@@ -172,13 +172,13 @@ function post(item) {
 function composer() {
   return state.account ? `<form class="panel post composer" data-form="post">
     <label class="field"><span>New post</span><textarea name="text" rows="3" maxlength="500" placeholder="Share an update…" required></textarea></label>
-    <div class="form-end"><span class="muted">${state.account.visibility === 'private' ? 'Approved connections' : 'Public'}</span><button class="button primary">Publish post</button></div></form>`
-    : `<article class="panel empty"><div><h3>Join the conversation</h3><p>Sign in to post and connect with members.</p></div>${button('Create account', 'signup', 'primary')}</article>`;
+    <div class="form-end"><span class="muted">${state.account.visibility === 'private' ? 'Followers only' : 'Public'}</span><button class="button primary">Post update</button></div></form>`
+    : `<article class="panel empty"><div><h3>Join the stream</h3><p>Sign in to post and connect with members.</p></div>${button('Create account', 'signup', 'primary')}</article>`;
 }
 
 function community() {
   const items = state.data?.feed?.items ?? [];
-  return heading('Commons', 'Updates from across the community.')
+  return heading('Stream', 'Updates from across the tunecloud community.')
     + '<div class="feed-column stack">' + composer() + (items.length ? items.map(post).join('') : '<p class="empty-note">No posts yet. New public updates will appear here.</p>')
     + (state.data?.feed?.next ? button('Load more posts', 'more', 'secondary') : '') + '</div>';
 }
@@ -190,7 +190,7 @@ function photoCard(item, editorial = false) {
   const caption = editorial ? item.title : item.text;
   return `<article class="photo-card">
     <button type="button" class="photo-open" data-action="photo/${id}" aria-label="Open ${esc(caption || 'photo')}"><img src="${src}" loading="lazy" alt="${esc(editorial ? item.alt : caption || 'Member photo')}"></button>
-    <div class="photo-meta"><div><strong>${esc(caption || 'Untitled')}</strong><small>${editorial ? 'Field Notes' : '<a href="#' + userRoute(item.author.username) + '">@' + esc(item.author.username) + '</a>'}</small></div>
+    <div class="photo-meta"><div><strong>${esc(caption || 'Untitled')}</strong><small>${editorial ? 'Moments' : '<a href="#' + userRoute(item.author.username) + '">@' + esc(item.author.username) + '</a>'}</small></div>
     <div class="photo-actions">${button(icon('heart'), 'favorite/' + id, 'icon quiet' + (saved ? ' saved' : ''), '', 'aria-label="' + (saved ? 'Remove favorite' : 'Save photo') + '" aria-pressed="' + Boolean(saved) + '"')}${item.own ? button(icon('more'), 'remove/' + id, 'icon quiet', '', 'aria-label="Manage photo"') : ''}</div></div></article>`;
 }
 
@@ -198,9 +198,9 @@ function photos() {
   const saved = state.photoMode === 'saved';
   const items = state.data?.feed?.items ?? [];
   const field = saved ? collection.filter(photo => state.account?.favorites.includes('field-' + photo.id)) : collection;
-  return heading('Stillroom', 'Photo collections and moments from the community.', button('Share a photo', 'upload', 'primary', 'plus'))
+  return heading('Moments', 'Photos and moments from the community.', button('Share a moment', 'upload', 'primary', 'plus'))
     + `<div class="tabs">${button('Discover', 'photos/all', saved ? 'plain' : 'selected')}${button('Saved photos', 'photos/saved', saved ? 'selected' : 'plain')}</div>
-    ${field.length ? '<section class="stack"><h2>' + (saved ? 'Saved from Field Notes' : 'Field Notes') + '</h2><div class="photo-grid">' + field.map(photo => photoCard(photo, true)).join('') + '</div></section>' : ''}
+    ${field.length ? '<section class="stack"><h2>' + (saved ? 'Saved from Moments' : 'Moments') + '</h2><div class="photo-grid">' + field.map(photo => photoCard(photo, true)).join('') + '</div></section>' : ''}
     <section class="section stack"><h2>${saved ? 'Saved from the community' : 'Community photos'}</h2>
     ${items.length ? '<div class="photo-grid">' + items.map(item => photoCard(item)).join('') + '</div>' : '<p class="empty-note">' + (saved ? 'Save a photo to find it here.' : 'Be the first to share a photo.') + '</p>'}
     ${state.data?.feed?.next ? button('Load more photos', 'more', 'secondary') : ''}</section>`;
@@ -218,7 +218,7 @@ function trackRow(track, compact = false) {
 }
 
 function music() {
-  return heading('Lowline', 'Original recordings from the Sidewave catalog.')
+  return heading('Tracks', 'Original tracks from the tunecloud catalog.')
     + featured() + '<section class="panel section"><h2>All tracks</h2>' + tracks.map(track => trackRow(track)).join('') + '</section>'
     + (state.account && eligible(state.account.plan, 'plus') && state.account.flags.listeningHistory ? '<section class="section panel"><h2>Listening history</h2>' +
       (state.account.history.length ? state.account.history.map(entry => {
@@ -228,7 +228,7 @@ function music() {
 }
 
 function billing() {
-  return heading('Membership', 'Choose a plan or buy credits to unlock individual tracks.')
+  return heading('Go Pro', 'Choose a plan or buy credits to unlock full tracks.')
     + (!state.payments ? '<p class="info">Checkout is currently unavailable. Free accounts can browse and share content.</p>' : '')
     + `<div class="plan-grid">${plans.map(plan => {
       const active = (state.account?.plan || 'free') === plan.id;
@@ -242,22 +242,22 @@ function billing() {
     }).join('')}</div>
     ${state.account?.billingProfile ? '<div class="actions">' + button('Manage billing', 'portal', 'secondary', '', state.payments ? '' : 'disabled') + '</div>' : ''}
     <section class="section stack">
-      ${titleRow('Credit packs', state.account ? '<div class="actions inline"><span class="pill">' + state.account.credits + ' credits available</span>' + button('Refresh balance', 'sync-account', 'text') + '</div>' : '')}
+      ${titleRow('Credits', state.account ? '<div class="actions inline"><span class="pill">' + state.account.credits + ' credits available</span>' + button('Refresh balance', 'sync-account', 'text') + '</div>' : '')}
       <div class="plan-grid">${creditPacks.map(pack => `<article class="plan panel"><h3>${pack.credits} credits</h3><p>${price(pack.cents)} USD</p>${button('Buy credits', 'checkout/' + pack.id, 'secondary', '', state.payments ? '' : 'disabled')}</article>`).join('')}</div>
     </section>
-    ${state.account ? '<section class="section panel"><h2>Credit purchases</h2>' + (state.data?.receipts?.length ? state.data.receipts.map(receipt => '<div class="list-row"><strong>+' + receipt.credits + ' credits</strong><span>' + dateLabel(receipt.createdAt) + '</span></div>').join('') : '<p class="muted">Completed purchases appear here.</p>') + '</section>' : ''}`;
+    ${state.account ? '<section class="section panel"><h2>Purchase history</h2>' + (state.data?.receipts?.length ? state.data.receipts.map(receipt => '<div class="list-row"><strong>+' + receipt.credits + ' credits</strong><span>' + dateLabel(receipt.createdAt) + '</span></div>').join('') : '<p class="muted">Your purchases appear here.</p>') + '</section>' : ''}`;
 }
 
 function account() {
   const me = state.account;
-  if (!me) return heading('Your account', 'Set up your profile and choose who can see your updates.') + '<div class="panel actions">' + button('Create account', 'signup', 'primary') + button('Sign in', 'login', 'secondary') + '</div>';
+  if (!me) return heading('Your profile', 'Set up your profile and choose who can see your content.') + '<div class="panel actions">' + button('Create account', 'signup', 'primary') + button('Sign in', 'login', 'secondary') + '</div>';
   const connections = state.data?.connections ?? [];
   return heading('Settings', 'Manage your profile, connections, and preferences.', button('Sign out', 'logout', 'secondary'))
     + `<div class="settings-grid"><section class="panel"><h2>Profile</h2>
       <form class="stack" data-form="settings">
         <label class="field">Display name<input name="name" value="${esc(me.name)}" minlength="2" maxlength="45" required></label>
         <label class="field">Bio<textarea name="bio" rows="2" maxlength="160">${esc(me.bio)}</textarea></label>
-        <label class="field">Profile visibility<select name="visibility"><option value="public"${me.visibility === 'public' ? ' selected' : ''}>Public</option><option value="private"${me.visibility === 'private' ? ' selected' : ''}>Approved connections only</option></select></label>
+        <label class="field">Profile visibility<select name="visibility"><option value="public"${me.visibility === 'public' ? ' selected' : ''}>Public</option><option value="private"${me.visibility === 'private' ? ' selected' : ''}>Followers only</option></select></label>
         <p class="muted">Your username and display name appear in search. The visibility setting applies to your bio, posts, and photos.</p>
         <button class="button primary">Save profile</button>
       </form></section>
@@ -277,7 +277,7 @@ function account() {
 
 function member() {
   const profile = state.data?.member;
-  if (!profile) return heading('Member profile', 'Loading profile…');
+  if (!profile) return heading('Profile', 'Loading profile…');
   const action = profile.own ? link('Edit profile', 'account', 'secondary')
     : profile.connection ? button(profile.connection === 'approved' ? 'Disconnect' : 'Cancel request', 'withdraw/' + esc(profile.username), 'secondary')
       : button('Request connection', 'connect/' + esc(profile.username), 'primary', 'plus');
@@ -290,14 +290,14 @@ function member() {
       (state.data.feed.next ? button('Load more posts', 'profile-posts', 'secondary') : '') + '</section><section class="section stack"><h2>Photos</h2>' +
       (pictures.length ? '<div class="photo-grid">' + pictures.map(item => photoCard(item)).join('') + '</div>' : '<p class="muted">No photos yet.</p>') +
       (state.data.photos.next ? button('Load more photos', 'profile-photos', 'secondary') : '') + '</section>'
-      : '<section class="panel section empty">' + icon('lock') + '<div><h2>Private profile</h2><p>Request a connection to see this member’s posts and photos.</p></div></section>'}`;
+      : '<section class="panel section empty">' + icon('lock') + '<div><h2>Private profile</h2><p>Follow to see their posts and moments</p></div></section>'}`;
 }
 
 function search() {
   const results = state.data?.members;
-  return heading('Find members', state.search ? 'Usernames starting with “' + esc(state.search) + '”' : 'Enter a username in the search bar.')
+  return heading('Find people', state.search ? 'Usernames starting with “' + esc(state.search) + '”' : 'Enter a username in the search bar.')
     + (results?.length ? '<div class="panel">' + results.map(person => '<a class="list-row identity" href="#' + userRoute(person.username) + '">' + avatar(person.name) + '<span><strong>' + esc(person.name) + '</strong><small>@' + esc(person.username) + '</small></span></a>').join('') + '</div>'
-    : '<p class="empty-note">' + (results ? 'No members found.' : 'Search results appear here.') + '</p>');
+    : '<p class="empty-note">' + (results ? 'No people found.' : 'Search results appear here.') + '</p>');
 }
 
 async function refresh() {
@@ -335,8 +335,8 @@ function auth(mode = 'login') {
     ${create ? '<label class="field">Display name<input name="name" required minlength="2" maxlength="45" autocomplete="name"></label>' : ''}
     <label class="field">Username<input name="username" required minlength="3" maxlength="24" pattern="[a-zA-Z0-9][a-zA-Z0-9_\\-]{2,23}" autocomplete="username" autocapitalize="off"></label>
     <label class="field">Password<input name="password" type="password" maxlength="128" ${create ? 'minlength="12" autocomplete="new-password" placeholder="At least 12 characters"' : 'autocomplete="current-password"'} required></label>
-    <p class="error" data-error role="alert" hidden></p><button class="button primary wide">${create ? 'Create account' : 'Sign in'}</button>
-    </form><div class="form-end">${create ? button('Already a member? Sign in', 'login', 'text') : button('New to Sidewave? Create an account', 'signup', 'text')}</div>`);
+    <p class="error" data-error role="alert" hidden></p><button class="button primary wide">${create ? 'Create account' : 'Log in'}</button>
+    </form><div class="form-end">${create ? button('Already have an account? Log in', 'login', 'text') : button('New to tunecloud? Create an account', 'signup', 'text')}</div>`);
 }
 
 function openPhoto(id) {
@@ -352,9 +352,9 @@ function uploadDialog() {
     <p class="muted">JPEG, PNG, or WebP, up to 5 MB.</p>
     <img id="upload-preview" alt="Selected photo" hidden>
     <label class="field">Caption<textarea name="caption" maxlength="280" rows="2"></textarea></label>
-    <p class="muted">${state.account.visibility === 'private' ? 'Visible to approved connections.' : 'This photo will appear on your public profile.'}</p>
+    <p class="muted">${state.account.visibility === 'private' ? 'Visible to followers only.' : 'This moment will appear on your public profile.'}</p>
     <p class="error" data-error role="alert" hidden></p>
-    <button class="button primary">Publish photo</button></form>`);
+    <button class="button primary">Post moment</button></form>`);
 }
 
 function drawPlayer() {
@@ -444,24 +444,24 @@ async function action(name) {
   if (key === 'favorite') {
     const saved = !state.account.favorites.includes(id);
     ({ account: state.account } = await api('favorites', { id, saved }));
-    flash(saved ? 'Photo saved.' : 'Photo removed from favorites.');
+    flash(saved ? 'Moment saved.' : 'Moment removed from saved.');
     if (page() !== 'photos' || state.photoMode !== 'saved') return render();
   }
   if (['connect', 'withdraw', 'approve', 'drop'].includes(key)) {
     await api('connect', { username: id, action: ({ connect: 'request', drop: 'remove' })[key] ?? key });
-    flash(({ connect: 'Connection request sent.', withdraw: 'Connection canceled.', approve: 'Connection approved.', drop: 'Connection removed.' })[key]);
+    flash(({ connect: 'Follow request sent.', withdraw: 'Follow canceled.', approve: 'Follow approved.', drop: 'Follow removed.' })[key]);
   }
   if (key === 'remove') {
-    return modal('Remove this item?', '<p>It will be removed from your profile and the feed.</p><div class="actions">' + button('Remove item', 'confirm-remove/' + id, 'danger') + button('Cancel', 'close', 'secondary') + '</div>');
+    return modal('Remove this?', '<p>It will be removed from your profile and the feed.</p><div class="actions">' + button('Remove', 'confirm-remove/' + id, 'danger') + button('Cancel', 'close', 'secondary') + '</div>');
   }
   if (key === 'confirm-remove') {
     await api('remove', { id });
     dialog.close();
-    flash('Item removed.');
+    flash('Removed.');
   }
   if (key === 'unlock') {
     const track = tracks.find(item => item.id === id);
-    return modal('Unlock ' + track.title, '<p>This will use ' + track.credits + ' credits. The full track will be added to your account.</p><div class="actions">'
+    return modal('Unlock ' + track.title, '<p>This will use ' + track.credits + ' credits. The full track will be added to your library.</p><div class="actions">'
       + (state.account.credits >= track.credits ? button('Unlock track', 'confirm-unlock/' + id, 'primary') : '<a class="button primary" href="#billing" data-action="close-link">Get credits</a>') + '</div>');
   }
   if (key === 'confirm-unlock') {
@@ -491,9 +491,9 @@ async function submit(form) {
   if (kind === 'login' || kind === 'signup') {
     ({ account: state.account } = await api(kind, Object.fromEntries(data)));
     dialog.close();
-    flash(kind === 'signup' ? 'Welcome to Sidewave.' : 'Signed in.');
+    flash(kind === 'signup' ? 'Welcome to tunecloud.' : 'Signed in.');
   }
-  if (kind === 'post') { await api('posts', Object.fromEntries(data)); flash('Post published.'); }
+  if (kind === 'post') { await api('posts', Object.fromEntries(data)); flash('Update posted.'); }
   if (kind === 'settings') { ({ account: state.account } = await api('settings', Object.fromEntries(data))); flash('Profile saved.'); }
   if (kind === 'upload') { await api('photos', data); dialog.close(); state.photoMode = 'all'; flash('Photo published.'); }
   return refresh();
@@ -569,7 +569,7 @@ async function init() {
       history.replaceState(null, '', '/#billing');
       flash('Welcome back. Your purchase will appear after payment confirmation.');
     }
-  } catch { state.failure = 'Sidewave could not connect to its server.'; }
+  } catch { state.failure = 'tunecloud could not connect to its server.'; }
   state.connecting = false;
   if (state.failure) render();
   else await refresh();

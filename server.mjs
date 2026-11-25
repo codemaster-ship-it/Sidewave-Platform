@@ -17,8 +17,8 @@ const sessionLife = 7 * 86400;
 const usernamePattern = /^[a-z0-9][a-z0-9_-]{2,23}$/;
 const uidPattern = /^[a-f0-9-]{36}$/;
 const photoLimit = 5 * 1024 * 1024;
-const mime = { html: 'text/html; charset=utf-8', css: 'text/css; charset=utf-8', js: 'text/javascript; charset=utf-8', jpg: 'image/jpeg', mp3: 'audio/mpeg' };
-const staticPaths = new Map([['/', 'index.html'], ['/style.css', 'style.css'], ['/app.js', 'app.js'], ['/content.js', 'content.js']]);
+const mime = { html: 'text/html; charset=utf-8', css: 'text/css; charset=utf-8', js: 'text/javascript; charset=utf-8', jpg: 'image/jpeg', mp3: 'audio/mpeg', svg: 'image/svg+xml' };
+const staticPaths = new Map([['/', 'index.html'], ['/style.css', 'style.css'], ['/app.js', 'app.js'], ['/content.js', 'content.js'], ['/favicon.svg', 'favicon.svg'], ['/og-image.svg', 'og-image.svg']]);
 for (const id of ['lake', 'shore', 'ridge', 'dawn', 'night']) staticPaths.set('/media/' + id + '.jpg', 'media/' + id + '.jpg');
 
 class HttpError extends Error {
@@ -38,7 +38,7 @@ function setSecurityHeaders(res, https) {
 }
 
 function checkOrigin(req, origin) {
-  if (req.headers.origin !== origin) throw new HttpError(403, 'Start this action from Sidewave.');
+  if (req.headers.origin !== origin) throw new HttpError(403, 'Start this action from tunecloud.');
 }
 
 async function bodyBytes(req, maximum) {
@@ -141,8 +141,8 @@ async function normalizePhoto(file, size) {
   }
 }
 
-export async function createApp({ mongoUri, database = 'sidewave', appOrigin = 'http://localhost:3000', stripeConfig = null }) {
-  if (!mongoUri) throw new Error('Set MONGODB_URI before starting Sidewave.');
+export async function createApp({ mongoUri, database = 'tunecloud', appOrigin = 'http://localhost:3000', stripeConfig = null }) {
+  if (!mongoUri) throw new Error('Set MONGODB_URI before starting tunecloud.');
   const origin = new URL(appOrigin).origin;
   const https = origin.startsWith('https:');
   if (!https && !['localhost', '127.0.0.1', '[::1]'].includes(new URL(origin).hostname)) throw new Error('Use HTTPS for a deployed APP_ORIGIN.');
@@ -174,7 +174,7 @@ export async function createApp({ mongoUri, database = 'sidewave', appOrigin = '
 
   const billing = makeBilling({ config: stripeConfig, client, accounts, orders, origin, HttpError });
   const rate = limitRequests();
-  const cookieName = https ? '__Host-sidewave' : 'sidewave';
+  const cookieName = https ? '__Host-tunecloud' : 'tunecloud';
   const cookie = (token, maxAge) => cookieName + '=' + token + '; Path=/; HttpOnly; SameSite=Lax; Max-Age=' + maxAge + (https ? '; Secure' : '');
   let pendingHashes = 0;
   let uploads = 0;
@@ -454,7 +454,7 @@ export async function createApp({ mongoUri, database = 'sidewave', appOrigin = '
       }
       case '/api/listened': {
         const track = tracks.find(item => item.id === body.id);
-        if (!track || !eligible(planFor(account), 'plus') || !account.flags.listeningHistory) return respond(res, 200, { account: serialize(account) });
+        if (!track || !eligible(planFor(account), 'pro') || !account.flags.listeningHistory) return respond(res, 200, { account: serialize(account) });
         const updated = await accounts.findOneAndUpdate({ _id: ownerId, 'flags.listeningHistory': true, activeUntil: { $gt: new Date() } },
           { $push: { history: { $each: [{ id: track.id, at: new Date() }], $position: 0, $slice: 30 } } }, { returnDocument: 'after' });
         return respond(res, 200, { account: serialize(updated ?? await accounts.findOne({ _id: ownerId })) });
@@ -474,7 +474,7 @@ export async function createApp({ mongoUri, database = 'sidewave', appOrigin = '
     handle(req, res).catch(error => {
       if (res.destroyed) return;
       if (res.headersSent) { res.destroy(); return; }
-      if (!(error instanceof HttpError)) console.error('Sidewave request failed', error.name, error.code ?? '');
+      if (!(error instanceof HttpError)) console.error('tunecloud request failed', error.name, error.code ?? '');
       respond(res, error instanceof HttpError ? error.status : 500, { error: error instanceof HttpError ? error.message : 'Something went wrong. Try again.' });
     });
   });
@@ -523,10 +523,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   for (const signal of ['SIGINT', 'SIGTERM']) {
     process.once(signal, () => {
       closing ??= close().catch(error => {
-        console.error('Sidewave shutdown failed:', error.message);
+        console.error('tunecloud shutdown failed:', error.message);
         process.exitCode = 1;
       });
     });
   }
-  console.log('Sidewave is listening on port ' + app.server.address().port);
+  console.log('tunecloud is listening on port ' + app.server.address().port);
 }

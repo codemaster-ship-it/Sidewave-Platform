@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF5500"/>
+      <stop offset="100%" style="stop-color:#FF8800"/>
+    </linearGradient>
+  </defs>
+  <!-- Cloud shape -->
+  <path fill="url(#orangeGrad)" d="M26 18c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V14c0-1.1.9-2 2-2h4c.6 0 1-.4 1-1V7c0-2.2 1.8-4 4-4s4 1.8 4 4v1c0 .6.4 1 1 1h4c2.2 0 4 1.8 4 4v4z"/>
+  <!-- Sound wave lines -->
+  <path fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" d="M10 20v-6M13 20v-9M16 20v-4M19 20v-8"/>
+</svg>

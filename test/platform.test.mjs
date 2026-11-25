@@ -65,10 +65,10 @@ function asUser(browser, response) {
 }
 
 test('the three tiers and audio entitlements use the product catalog', () => {
-  assert.deepEqual(plans.map(plan => plan.id), ['free', 'plus', 'studio']);
+  assert.deepEqual(plans.map(plan => plan.id), ['free', 'pro', 'studio']);
   assert.equal(canPlay(null, tracks[0]), true);
   assert.equal(canPlay({ plan: 'free', unlocked: [] }, tracks[1]), false);
-  assert.equal(canPlay({ plan: 'plus', unlocked: [] }, tracks[1]), true);
+  assert.equal(canPlay({ plan: 'pro', unlocked: [] }, tracks[1]), true);
   assert.equal(canPlay({ plan: 'free', unlocked: [tracks[1].id] }, tracks[1]), true);
 });
 
@@ -124,7 +124,7 @@ test('signed-in users share real posts and photos with approved connections', as
 test('signed billing events reconcile once and a credit unlock survives a plan cancellation', async t => {
   const sdk = new Stripe('sk_test_fixture_value');
   const secret = 'whsec_fixture_value';
-  const prices = { credits25: 'price_pack25', credits100: 'price_pack100', credits250: 'price_pack250', plus: 'price_plus', studio: 'price_studio' };
+  const prices = { credits25: 'price_pack25', credits100: 'price_pack100', credits250: 'price_pack250', pro: 'price_pro', studio: 'price_studio' };
   const customer = 'cus_fixture';
   const checkoutId = 'cs_test_fixture';
   let checkout;
@@ -161,9 +161,9 @@ test('signed billing events reconcile once and a credit unlock survives a plan c
   assert.equal(receipts[0].credits, 25);
 
   const event = { id: 'evt_fixture_subscription', type: 'customer.subscription.updated', data: { object: { customer } } };
-  subscriptions = [{ status: 'active', items: { data: [{ price: { id: prices.plus }, current_period_end: Math.floor(Date.now() / 1000) + 3600 }] } }];
+  subscriptions = [{ status: 'active', items: { data: [{ price: { id: prices.pro }, current_period_end: Math.floor(Date.now() / 1000) + 3600 }] } }];
   await signed(event);
-  assert.equal((await (await buyer('/api/session')).json()).account.plan, 'plus');
+  assert.equal((await (await buyer('/api/session')).json()).account.plan, 'pro');
   await buyer('/api/flags', { id: 'listeningHistory', enabled: true });
   await buyer('/api/listened', { id: 'glass-horizon' });
   assert.equal((await (await buyer('/api/session')).json()).account.history[0].id, 'glass-horizon');
